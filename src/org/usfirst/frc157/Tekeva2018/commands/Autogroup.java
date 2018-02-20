@@ -44,9 +44,64 @@ public class Autogroup extends CommandGroup
     public Autogroup()
     {
         getGameData = DriverStation.getInstance().getGameSpecificMessage();
+        while(getGameData.equals("")) System.out.println("null game data");;
         System.out.println(getGameData);
         System.out.println("AutoGroup called");
-/*
+        boolean left = true;
+        if (false) {
+        	left = true;
+        }
+        else if (true) {
+        	left = false;
+        }
+        if (true) {//middle?
+        	if (getGameData.charAt(0) == 'L') {
+        		addSequential(new AutonMode5(true));
+        	}
+        	else if (getGameData.charAt(0) == 'R') {
+        		addSequential(new AutonMode5(false));
+        	}
+        }
+        else if (false) { //scale?
+	        if (getGameData.charAt(1) == 'R' && left)
+	        {
+	        	addSequential(new AutonMode4(left));
+	        }
+	        else if (getGameData.charAt(1) == 'R' && !left)
+	        {
+	        	addSequential(new AutonMode0(left));
+	        }
+	        else if (getGameData.charAt(1) == 'L' && left)
+	        {
+	        	addSequential(new AutonMode0(left));
+	        }
+	        else if (getGameData.charAt(1) == 'L' && !left)
+	        {
+	        	addSequential(new AutonMode4(left));
+	        }
+        }
+        else if (true) { //switch?
+        	System.out.println(getGameData);
+        	if (getGameData.charAt(0) == 'L' && left) {
+        		addSequential(new AutonMode2(left));
+        		System.out.println("AutonMode2 called");
+        	}
+        	else if (getGameData.charAt(0) == 'L' && !left) {
+        		addSequential(new AutonMode3(left));
+        		System.out.println("AutonMode3 called");
+        	}
+	        else if (getGameData.charAt(0) == 'R' && left)
+	        {
+	        	addSequential(new AutonMode3(left));
+	        	System.out.println("AutonMode3 called");
+	        }
+	        else if (getGameData.charAt(0) == 'R' && !left)
+	        {
+	        	addSequential(new AutonMode2(left));
+	        	System.out.println("AutonMode2 called");
+	        }
+        }
+        /*
         addSequential(new RaiseElevatorToPoistion(ElvPos.SWITCH));
         if (getGameData == "LLL"|| getGameData == "Rll")
         {
@@ -78,13 +133,6 @@ public class Autogroup extends CommandGroup
             addSequential(new DriveSpeedForDistance(-1*0.4, -1*0.4, 124.5, 124.5)); //TODO CHANGE 0.4, 0.4 TO AROUND 1 FOR COMP!!! 
         }
 
-        if (getGameData == "LRL" || getGameData == "RRL")
-        {
-            //StartPos: 2 Scale: R Switch: L Alliance: B
-            addParallel(new RaiseElevatorByPercent(0.5));
-            addSequential(new DriveSpeedForDistance(-1*0.4, -1*0.4, 124.5, 124.5)); //TODO CHANGE 0.4, 0.4 TO AROUND 1 FOR COMP!!!
-            //addSequentaial(new OpenForks(0.50));
-        }
 
         if (getGameData == "LLR" || getGameData == "RLR")
         {
@@ -94,7 +142,6 @@ public class Autogroup extends CommandGroup
         }
         */
         //addSequential(new DriveSpeedForDistance(-1*0.2, -1*0.2, 50, 50));
-        addSequential(new AutonMode1());
         //addParallel(new RaiseElevatorByPercent(-1*0.5));
 
 

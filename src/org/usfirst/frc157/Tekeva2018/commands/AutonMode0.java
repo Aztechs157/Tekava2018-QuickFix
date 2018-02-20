@@ -3,6 +3,7 @@ package org.usfirst.frc157.Tekeva2018.commands;
 
 import org.usfirst.frc157.Tekeva2018.PID;
 import org.usfirst.frc157.Tekeva2018.Robot;
+import org.usfirst.frc157.Tekeva2018.SlewRate;
 import org.usfirst.frc157.Tekeva2018.subsystems.PathManager;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -40,16 +41,21 @@ public class AutonMode0 extends Command
     private boolean autonFinished = false;
     private int ellipseX;
     private int ellipseY;
+    private SlewRate slewRate;
+    private boolean slewCut = false;
+    private int left = 1;
     
-    public AutonMode0()
+    public AutonMode0(boolean left)
     {
         requires(Robot.drive);
         startTime = Timer.getFPGATimestamp();
         state = autonState.driveArc1;
-        drivePID = new PID(0.16, 0, 0.000007, 999999, 99999, 999999, 9999999);
+        drivePID = new PID(0.025, 0.1, 0.000005, 10, 10, 999999, 9999999);
         gyroDrivePID = new PID(0.01, 0, 0.000001, 999999, 99999, 999999, 9999999);
         gyroPID = new PID(0.03, 0, 0.000003, 9999999, 9999999, 9999999, 999999);
         System.out.println("I got called"); 
+        slewRate = new SlewRate(0.001);
+        this.left = (left)? 1: -1;
        /* try {
         	pathManager = new PathManager();
         	pathOpen = true;
@@ -70,13 +76,19 @@ public class AutonMode0 extends Command
 
             case driveArc1:
                 encoder = -(Robot.drive.getRightEncoder()+Robot.drive.getLeftEncoder())/2.0;
-                target = 265;
+                target = 275;
                 drivePower = drivePID.pidCalculate(target, encoder);
-                ellipseX = 570;
+                if(!slewCut) {
+                	drivePower = slewRate.rateCalculate(drivePower);
+                }
+                if(Math.abs(drivePower)>=0.9) {
+                	slewCut = true;
+                }
+                ellipseX = 500;
                 ellipseY = 30;
                 x = xEllipseCalculate(ellipseX, ellipseY, encoder);
                 y = yEllipseCalculate(ellipseX, ellipseY, x);
-                angle = -angleEllipseCalculate(ellipseX, ellipseY, x);
+                angle = left*-angleEllipseCalculate(ellipseX, ellipseY, x);
                 /*x = xSinCalculate(48,1/48.0, encoder);
                 y = ySinCalculate(48,1/48.0, x);
                 angle = angleSinCalculate(48,1/48.0, x);*/
@@ -107,13 +119,19 @@ public class AutonMode0 extends Command
                 break;
             case driveArc2:
                 double encoder = -(Robot.drive.getRightEncoder()+Robot.drive.getLeftEncoder())/2.0;
-                target = 55;
+                target = 110;
                 drivePower = drivePID.pidCalculate(target, encoder);
-                ellipseX = 8;
-                ellipseY = 54;
+                if(!slewCut) {
+                	drivePower = slewRate.rateCalculate(drivePower);
+                }
+                if(Math.abs(drivePower)>=0.9) {
+                	slewCut = true;
+                }
+                ellipseX = 20;
+                ellipseY = 120;
                 x = xEllipseCalculate(ellipseX, ellipseY, encoder);
                 y = yEllipseCalculate(ellipseX, ellipseY, x);
-                angle = -angleEllipseCalculate(ellipseX, ellipseY, x);
+                angle = left*-angleEllipseCalculate(ellipseX, ellipseY, x);
                 /*x = xSinCalculate(48,1/48.0, encoder);
                 y = ySinCalculate(48,1/48.0, x);
                 angle = angleSinCalculate(48,1/48.0, x);*/
@@ -143,15 +161,16 @@ public class AutonMode0 extends Command
                 }
                 break;
             case turnRight90:
-                drivePower = gyroPID.pidCalculate(90, Robot.drive.getAngle());
+                drivePower = gyroPID.pidCalculate(left*90, Robot.drive.getAngle());
                 System.out.println("Angle: " + Robot.drive.getAngle() + "\nPower: " + drivePower);
                 Robot.drive.AutoDrive(-drivePower, drivePower);
-                if (Math.abs(Robot.drive.getAngle() - 90) < 2.0)
+                if (Math.abs(Robot.drive.getAngle() - left*90) < 2.0)
                 {
                     repsAtTarget++;
                     if (repsAtTarget >= 10)
                     {	
                     	reset();
+                    	slewRate = new SlewRate(0.002);
                         state = autonState.driveArc2;
                     }
                 }
@@ -165,7 +184,7 @@ public class AutonMode0 extends Command
             case driveBack3:
         		System.out.println("driveBack3 called");
             	encoder = -(Robot.drive.getRightEncoder()+Robot.drive.getLeftEncoder())/2.0;
-                target = -25;
+                target = -35;
                 drivePower = drivePID.pidCalculate(target, encoder);
                 
                 System.out.println("Right Encoder: "+Robot.drive.getRightEncoder()+"\nLeft Encoder: "+Robot.drive.getLeftEncoder());
@@ -197,7 +216,7 @@ public class AutonMode0 extends Command
             	System.out.println("wait1000Msec1");
             	repsAtTarget++;
             	System.out.println(repsAtTarget);
-            	if(repsAtTarget>=100) {
+            	if(repsAtTarget>=50) {
             		state = autonState.driveBack3;
             		System.out.println("moving to driveBack3");
             		repsAtTarget = 0;
@@ -207,7 +226,7 @@ public class AutonMode0 extends Command
         		System.out.println("wait1000Msec2 called");
             	repsAtTarget++;
             	System.out.println(repsAtTarget);
-            	if(repsAtTarget>=100) {
+            	if(repsAtTarget>=50) {
             		state = autonState.turnRight90;
             		System.out.println("moving to turnRight90");
             		repsAtTarget = 0;

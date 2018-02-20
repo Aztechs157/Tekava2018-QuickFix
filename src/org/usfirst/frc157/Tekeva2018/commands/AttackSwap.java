@@ -46,8 +46,8 @@ public class AttackSwap extends Command {
     @Override
     protected void execute() 
     {
-        Robot.drive.AttackDrive = true;
         Robot.drive.onestick = false;
+        Robot.drive.AttackDrive = true;
     }
 
     // Make this return true when this Command no longer needs to run execute()

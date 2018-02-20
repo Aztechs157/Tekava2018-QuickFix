@@ -67,7 +67,7 @@ public class Drive extends Subsystem {
         driveRight1.set(ControlMode.PercentOutput, 0.0);
         driveRight2.set(ControlMode.Follower, 2);
         driveLeft1.set(ControlMode.PercentOutput, 0.0);
-        driveLeft2.set(ControlMode.Follower, 11);
+        driveLeft2.set(ControlMode.Follower, 9);
         /*driveRight1.setNeutralMode(NeutralMode.Brake);
         driveRight2.setNeutralMode(NeutralMode.Brake);
         driveLeft1.setNeutralMode(NeutralMode.Brake);
@@ -92,28 +92,30 @@ public class Drive extends Subsystem {
         double right = Robot.oi.getGamePadController().getRawAxis(Robot.oi.RYStick) * potentiometer;
         System.out.println(right);
         double left = -Robot.oi.getGamePadController().getRawAxis(Robot.oi.LYStick ) * potentiometer;
+        double leftx = Robot.oi.getGamePadController().getRawAxis(Robot.oi.RxStick);
+        double yAxis = Robot.oi.getGamePadController().getRawAxis(Robot.oi.RxStick);
         System.out.println(left);
         if (!onestick)
         {
             if (AttackDrive)
             {
-                double RatkPot = Robot.oi.getAttackR().getRawAxis(Robot.oi.RatkPot);
-                double Latk = -Robot.oi.getAttackL().getRawAxis(Robot.oi.Latk) * (RatkPot * potentiometer);
-                double Ratk = Robot.oi.getAttackR().getRawAxis(Robot.oi.Ratk) * (RatkPot * potentiometer);
+                double RatkPot = 1;//Robot.oi.getAttackR().getRawAxis(Robot.oi.RatkPot);
+                double Latk = -Robot.oi.getAttackL().getRawAxis(Robot.oi.Latk); // * (RatkPot * potentiometer);
+                double Ratk = Robot.oi.getAttackR().getRawAxis(Robot.oi.Ratk); //* (RatkPot * potentiometer);
                 driveLeft1.set(Latk);
                 driveRight1.set(Ratk);
             }
             else
             {
-            driveRight1.set(left); // Change to RDrive * potentiometer
-            driveLeft1.set(right); // Change to LDrive * potentiometer
+            driveRight1.set(right); // Change to RDrive * potentiometer
+            driveLeft1.set(left); // Change to LDrive * potentiometer
             }
         }
         if (onestick)
         {
-            double RxDrive = Robot.oi.getGamePadController().getRawAxis(Robot.oi.RxStick) * potentiometer;
-            driveRight1.set((left + RxDrive));
-            driveLeft1.set((-left + RxDrive));
+            double RxDrive = Robot.oi.getGamePadController().getRawAxis(Robot.oi.RYStick);// * potentiometer;
+            driveRight1.set(yAxis + RxDrive);
+            driveLeft1.set(yAxis - RxDrive);
         }
 
     }
